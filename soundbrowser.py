@@ -8,6 +8,10 @@ root = xml.getroot()
 print('xml loaded!')
 
 def get_sound_dict(sound):
+    """
+    Function to extract relevant data from a sound element. Returns a dictionary
+    with author tags, crowd tags, description, ID, and file URL.
+    """
     crowd_tags = [tag.attrib['label']
                   for tag in sound.xpath('./crowd-tags/tag/raw')]
     author_tags = [tag.attrib['label']
@@ -27,6 +31,10 @@ description = './sound[description[contains(.,"{}")]]'
 
 @app.route('/',methods=['GET'])
 def main_page():
+    """
+    Function to display the main page. This is the first thing you see when you
+    load the website.
+    """
     get_or_post = request.method
     return render_template('index.html',
                                 query = '',
@@ -35,6 +43,10 @@ def main_page():
 
 @app.route('/search/', methods=['POST'])
 def search():
+    """
+    Search function. Is called when the search form is submitted. Checks what kind
+    of query the user makes, and selects the relevant results using XPATH.
+    """
     global query
     global kind
     global results
@@ -66,6 +78,9 @@ def search():
 
 @app.route('/all/')
 def all():
+    """
+    Function that is called when the user asks to display all entries in the corpus.
+    """
     global results
     query = 'all'
     results = root.xpath('./sound')
@@ -80,6 +95,10 @@ def all():
 
 @app.route('/id/<id_number>')
 def sound_page(id_number):
+    """
+    Function that is called when the user asks to display a page with a given ID.
+    If the ID is not known, the website will display 'No sound with that ID.'
+    """
     results = root.xpath('./sound[@id="{}"]'.format(id_number))
     if results:
         return render_template('index.html',
@@ -95,6 +114,11 @@ def sound_page(id_number):
                                 sound = False)
 
 def previous_and_next(number, num_results):
+    """
+    Function that takes the current sound index, and the number of results, and
+    returns values for previous_item and next_item. If there is no previous or
+    next, the return value is None.
+    """
     max_number = num_results - 1
     if number < max_number:
         next_item = number + 1
@@ -108,6 +132,13 @@ def previous_and_next(number, num_results):
 
 @app.route('/browse/<number>')
 def browse(number):
+    """
+    Function that is called when the user browses through the results and presses
+    either 'previous' or 'next'. If, for some reason, the user ends up on this page
+    without having pressed 'previous' or 'next' the website will display a page with
+    the relevant sound for the previous search. If the number exceeds the amount
+    of results, the user gets redirected to the all-page.
+    """
     number = int(number)
     num_results = len(results)
     if number in range(num_results):

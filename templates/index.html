@@ -1,0 +1,111 @@
+<html>
+<head>
+<title>Sound Browser -- The VU Sound Corpus</title>
+    <style>
+body {  background-color:azure;
+        font-family: "Helvetica";
+        font-size: 14;
+        }
+
+footer {
+    background-color: white;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    overflow:hidden;
+}      
+        
+input[type=submit] {
+    padding:2px 15px; 
+    background-color:firebrick; 
+    border:0 none;
+    cursor:pointer;
+    -webkit-border-radius: 12px;
+    border-radius: 12px;
+    font-size: 14;
+    color: white;
+}
+
+        
+a {
+    color:dimgrey;
+}
+        
+.button {
+  background-color: firebrick;
+  padding: 7px 10px 7px 10px;
+  border:0 none;
+  cursor:pointer;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+  font-size: 14;
+  text-decoration: none;
+  color: white;
+}
+        
+</style>
+</head>
+<body>
+<center>
+<h1>The VU Sound Corpus</h1>
+    
+<form id="search" action='/search/' method="POST">
+<table>
+<tr><td><input type="text" size="60" name="query" value="{{query}}"/></td><td><input type='submit' value='Search'/></td></tr>
+<tr><td><center>
+<input type="radio" name="kind" value="crowd"
+    {% if kind == "crowd" %}checked="checked"{% endif %}/>Crowd-tags
+<input type="radio" name="kind" value="author" 
+    {% if kind == "author" %}checked="checked"{% endif %}/>Author-tags
+<input type="radio" name="kind" value="description"
+    {% if kind == "description" %}checked="checked"{% endif %}/>Description
+<input type="radio" name="kind" value="ID"
+    {% if kind == "ID" %}checked="checked"{% endif %}/>ID</center></td><td></td></tr>
+    </table>
+ 
+</form>
+    
+{% if sound %}
+
+<table width="600">
+   <thead><td colspan="2" style="padding:10px"><center><b>Sound #{{sound.id}}</b><br/>
+       {% if kind != "ID" or query == "all"%}<span style="font-size:10px">Result {{current}}/{{num_results}}</span>{% endif %}
+       </center></td></thead>
+    
+    <tr><td colspan="2" align="center"> {% if previous_item is not none %}<a href="{{url_for('browse', number=previous_item)}}">Previous</a>{% endif %}{% if previous_item is not none and next_item is not none %} - {% endif %}{% if next_item is not none %}<a href="{{url_for('browse', number=next_item)}}">Next</a>{% endif %} </td></tr>
+    
+    <tr><td colspan="2">{{sound.description}}</td></tr>
+    <tr><td colspan="2" align="center"  style="padding:15px">
+    <table>
+        <tr><td align="right">
+            <audio controls>
+            <source src="{{sound.file}}" type="audio/mpeg">        
+            Your browser does not support the audio element.
+            </audio>
+        </td>
+        <td align="left">
+                <a href="{{sound.file}}" class="button">Save</a>
+        </td></tr> 
+    </table>
+    </td></tr>
+
+    <tr><td width="100px" valign="top"><b>Crowd</b></td>
+        <td>{{sound.crowd_tags}}</td></tr>
+    <tr><td width="100px" valign="top"><b>Freesound</b></td>
+        <td>{{sound.author_tags}}</td></tr>
+</table>
+{% elif kind == "ID" %}
+    <b>No sound with that ID.</b>
+{% elif query %}
+    <b>No results.</b>
+{% endif %}
+</center>    
+
+<footer>
+    <div style="padding:10px; font-size:10px"><b>Citation information</b><br/>Annotations: Emiel van Miltenburg, Benjamin Timmermans and Lora Aroyo (2016) <i>The VU Sound Corpus: Adding more fine-grained annotations to the Freesound database.</i> To appear in: Proceedings of LREC.<br/>
+        <a href="http://www.freesound.org">The Freesound database</a>: Frederic Font, Gerard Roma, and Xavier Serra (2013) <i>Freesound technical demo.</i> In: Proceedings of the 21st ACM international conference on Multimedia. ACM.</div>
+    
+</footer>
+</body>
+</html>
